@@ -1,3 +1,5 @@
+//! ERFA Timescales Functions
+
 use std::ffi::CString;
 
 use crate::{raw::timescales::*, unexpected_val_err, ERFAError};

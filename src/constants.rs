@@ -1,4 +1,4 @@
-//! Constant values used by ERFA
+//! ERFA Constants
 
 /// Pi
 pub const ERFA_DPI: f64 = 3.141592653589793238462643;

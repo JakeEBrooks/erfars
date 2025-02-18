@@ -1,20 +1,6 @@
 //! Raw bindings to the ERFA C library
 #![allow(missing_docs)]
 
-pub mod calendar {
-    use std::ffi::{c_double, c_int};
-
-    unsafe extern "C" {
-        pub unsafe fn eraCal2jd(iy: c_int, im: c_int, id: c_int, djm0: *mut c_double, djm: *mut c_double) -> c_int;
-        pub unsafe fn eraEpb(dj1: c_double, dj2: c_double) -> c_double;
-        pub unsafe fn eraEpb2jd(epb: c_double, djm0: *mut c_double, djm: *mut c_double);
-        pub unsafe fn eraEpj(dj1: c_double, dj2: c_double) -> c_double;
-        pub unsafe fn eraEpj2jd(epj: c_double, djm0: *mut c_double, djm: *mut c_double);
-        pub unsafe fn eraJd2cal(dj1: c_double, dj2: c_double, iy: *mut c_int, im: *mut c_int, id: *mut c_int, fd: *mut c_double) -> c_int;
-        pub unsafe fn eraJdcalf(ndp: c_int, dj1: c_double, dj2: c_double, iymdf: *mut [c_int; 4]) -> c_int;
-    }
-}
-
 pub mod astrometry {
     use std::ffi::{c_char, c_double, c_int};
 
@@ -59,6 +45,33 @@ pub mod astrometry {
     }
 }
 
+pub mod calendar {
+    use std::ffi::{c_double, c_int};
+
+    unsafe extern "C" {
+        pub unsafe fn eraCal2jd(iy: c_int, im: c_int, id: c_int, djm0: *mut c_double, djm: *mut c_double) -> c_int;
+        pub unsafe fn eraEpb(dj1: c_double, dj2: c_double) -> c_double;
+        pub unsafe fn eraEpb2jd(epb: c_double, djm0: *mut c_double, djm: *mut c_double);
+        pub unsafe fn eraEpj(dj1: c_double, dj2: c_double) -> c_double;
+        pub unsafe fn eraEpj2jd(epj: c_double, djm0: *mut c_double, djm: *mut c_double);
+        pub unsafe fn eraJd2cal(dj1: c_double, dj2: c_double, iy: *mut c_int, im: *mut c_int, id: *mut c_int, fd: *mut c_double) -> c_int;
+        pub unsafe fn eraJdcalf(ndp: c_int, dj1: c_double, dj2: c_double, iymdf: *mut [c_int; 4]) -> c_int;
+    }
+}
+
+pub mod eclipticcoordinates {
+    use std::ffi::c_double;
+
+    unsafe extern "C" {
+        pub unsafe fn eraEceq06(date1: c_double, date2: c_double, dl: c_double, db: c_double, dr: *mut c_double, dd: *mut c_double);
+        pub unsafe fn eraEcm06(date1: c_double, date2: c_double, rm: *mut [c_double; 9]);
+        pub unsafe fn eraEqec06(date1: c_double, date2: c_double, dr: c_double, dd: c_double, dl: *mut c_double, db: *mut c_double);
+        pub unsafe fn eraLteceq(epj: c_double, dl: c_double, db: c_double, dr: *mut c_double, dd: *mut c_double);
+        pub unsafe fn eraLtecm(epj: c_double, rm: *mut [c_double; 9]);
+        pub unsafe fn eraLteqec(epj: c_double, dr: c_double, dd: c_double, dl: *mut c_double, db: *mut c_double);
+    }
+}
+
 pub mod ephemerides {
     use std::ffi::{c_double, c_int};
 
@@ -90,6 +103,50 @@ pub mod fundamentalargs {
     }
 }
 
+pub mod galacticcoordinates {
+    use std::ffi::c_double;
+
+    unsafe extern "C" {
+        pub unsafe fn eraG2icrs(dl: c_double, db: c_double, dr: *mut c_double, dd: *mut c_double);
+        pub unsafe fn eraIcrs2g(dr: c_double, dd: c_double, dl: *mut c_double, db: *mut c_double);
+    }
+}
+
+pub mod geodeticgeocentric {
+    use std::ffi::{c_double, c_int};
+
+    unsafe extern "C" {
+        pub unsafe fn eraEform(n: c_int, a: *mut c_double, f: *mut c_double) -> c_int;
+        pub unsafe fn eraGc2gd(n: c_int, xyz: *const [c_double; 3], elong: *mut c_double, phi: *mut c_double, height: *mut c_double) -> c_int;
+        pub unsafe fn eraGc2gde(a: c_double, f: c_double, xyz: *const [c_double; 3], elong: *mut c_double, phi: *mut c_double, height: *mut c_double) -> c_int;
+        pub unsafe fn eraGd2gc(n: c_int, elong: c_double, phi: c_double, height: c_double, xyz: *mut [c_double; 3]) -> c_int;
+        pub unsafe fn eraGd2gce(a: c_double, f: c_double, elong: c_double, phi: c_double, height: c_double, xyz: *mut [c_double; 3]) -> c_int;
+    }
+}
+
+pub mod gnomonic {
+    use std::ffi::{c_double, c_int};
+
+    unsafe extern "C" {
+        pub unsafe fn eraTpors(xi: c_double, eta: c_double, a: c_double, b: c_double, a01: *mut c_double, b01: *mut c_double, a02: *mut c_double, b02: *mut c_double) -> c_int;
+        pub unsafe fn eraTporv(xi: c_double, eta: c_double, v: *mut [c_double; 3], v01: *mut [c_double; 3], v02: *mut [c_double; 3]) -> c_int;
+        pub unsafe fn eraTpsts(xi: c_double, eta: c_double, a0: c_double, b0: c_double, a: *mut c_double, b: *mut c_double);
+        pub unsafe fn eraTpstv(xi: c_double, eta: c_double, v0: *mut [c_double; 3], v: *mut [c_double; 3]);
+        pub unsafe fn eraTpxes(a: c_double, b: c_double, a0: c_double, b0: c_double, xi: *mut c_double, eta: *mut c_double) -> c_int;
+        pub unsafe fn eraTpxev(v: *mut [c_double; 3], v0: *mut [c_double; 3], xi: *mut c_double, eta: *mut c_double) -> c_int;
+    }
+}
+
+pub mod horizonequatorial {
+    use std::ffi::c_double;
+
+    unsafe extern "C" {
+        pub unsafe fn eraAe2hd(az: c_double, el: c_double, phi: c_double, ha: *mut c_double, dec: *mut c_double);
+        pub unsafe fn eraHd2ae(ha: c_double, dec: c_double, phi: c_double, az: *mut c_double, el: *mut c_double);
+        pub unsafe fn eraHd2pa(ha: c_double, dec: c_double, phi: c_double) -> c_double;
+    }
+}
+
 pub mod precnutpolar {
     use std::ffi::c_double;
 
@@ -97,22 +154,22 @@ pub mod precnutpolar {
         pub unsafe fn eraBi00(dpsibi: *mut c_double, depsbi: *mut c_double, dra: *mut c_double);
         pub unsafe fn eraBp00(date1: c_double, date2: c_double, rb: *mut [c_double; 9], rp: *mut [c_double; 9], rbp: *mut [c_double; 9]);
         pub unsafe fn eraBp06(date1: c_double, date2: c_double, rb: *mut [c_double; 9], rp: *mut [c_double; 9], rbp: *mut [c_double; 9]);
-        pub unsafe fn eraBpn2xy(rbpn: *mut [c_double; 9], x: *mut c_double, y: *mut c_double);
+        pub unsafe fn eraBpn2xy(rbpn: *const [c_double; 9], x: *mut c_double, y: *mut c_double);
         pub unsafe fn eraC2i00a(date1: c_double, date2: c_double, rc2i: *mut [c_double; 9]);
         pub unsafe fn eraC2i00b(date1: c_double, date2: c_double, rc2i: *mut [c_double; 9]);
         pub unsafe fn eraC2i06a(date1: c_double, date2: c_double, rc2i: *mut [c_double; 9]);
-        pub unsafe fn eraC2ibpn(date1: c_double, date2: c_double, rbpn: *mut [c_double; 9], rc2i: *mut [c_double; 9]);
+        pub unsafe fn eraC2ibpn(date1: c_double, date2: c_double, rbpn: *const [c_double; 9], rc2i: *mut [c_double; 9]);
         pub unsafe fn eraC2ixy(date1: c_double, date2: c_double, x: c_double, y: c_double, rc2i: *mut [c_double; 9]);
         pub unsafe fn eraC2ixys(x: c_double, y: c_double, s: c_double, rc2i: *mut [c_double; 9]);
         pub unsafe fn eraC2t00a(tta: c_double, ttb: c_double, uta: c_double, utb: c_double, xp: c_double, yp: c_double, rc2t: *mut [c_double; 9]);
         pub unsafe fn eraC2t00b(tta: c_double, ttb: c_double, uta: c_double, utb: c_double, xp: c_double, yp: c_double, rc2t: *mut [c_double; 9]);
         pub unsafe fn eraC2t06a(tta: c_double, ttb: c_double, uta: c_double, utb: c_double, xp: c_double, yp: c_double, rc2t: *mut [c_double; 9]);
-        pub unsafe fn eraC2tcio(rc2i: *mut [c_double; 9], era: c_double, rpom: *mut [c_double; 9], rc2t: *mut [c_double; 9]);
-        pub unsafe fn eraC2teqx(rbpn: *mut [c_double; 9], gst: c_double, rpom: *mut [c_double; 9], rc2t: *mut [c_double; 9]);
+        pub unsafe fn eraC2tcio(rc2i: *const [c_double; 9], era: c_double, rpom: *const [c_double; 9], rc2t: *mut [c_double; 9]);
+        pub unsafe fn eraC2teqx(rbpn: *const [c_double; 9], gst: c_double, rpom: *const [c_double; 9], rc2t: *mut [c_double; 9]);
         pub unsafe fn eraC2tpe(tta: c_double, ttb: c_double, uta: c_double, utb: c_double, dpsi: c_double, deps: c_double, xp: c_double, yp: c_double, rc2t: *mut [c_double; 9]);
         pub unsafe fn eraC2txy(tta: c_double, ttb: c_double, uta: c_double, utb: c_double, x: c_double, y: c_double, xp: c_double, yp: c_double, rc2t: *mut [c_double; 9]);
         pub unsafe fn eraEo06a(date1: c_double, date2: c_double) -> c_double;
-        pub unsafe fn eraEors(rnpb: *mut [c_double; 9], s: c_double) -> c_double;
+        pub unsafe fn eraEors(rnpb: *const [c_double; 9], s: c_double) -> c_double;
         pub unsafe fn eraFw2m(gamb: c_double, phib: c_double, psi: c_double, eps: c_double, r: *mut [c_double; 9]);
         pub unsafe fn eraFw2xy(gamb: c_double, phib: c_double, psi: c_double, eps: c_double, x: *mut c_double, y: *mut c_double);
         pub unsafe fn eraLtp(epj: c_double, rp: *mut [c_double; 9]);
@@ -177,7 +234,7 @@ pub mod rotationtime {
         pub unsafe fn eraGmst82(dj1: c_double, dj2: c_double) -> c_double;
         pub unsafe fn eraGst00a(uta: c_double, utb: c_double, tta: c_double, ttb: c_double) -> c_double;
         pub unsafe fn eraGst00b(uta: c_double, utb: c_double) -> c_double;
-        pub unsafe fn eraGst06(uta: c_double, utb: c_double, tta: c_double, ttb: c_double, rnpb: *mut [c_double; 9]) -> c_double;
+        pub unsafe fn eraGst06(uta: c_double, utb: c_double, tta: c_double, ttb: c_double, rnpb: *const [c_double; 9]) -> c_double;
         pub unsafe fn eraGst06a(uta: c_double, utb: c_double, tta: c_double, ttb: c_double) -> c_double;
         pub unsafe fn eraGst94(uta: c_double, utb: c_double) -> c_double;
     }
@@ -209,40 +266,6 @@ pub mod starcatalogs {
     }
 }
 
-pub mod eclipticcoordinates {
-    use std::ffi::c_double;
-
-    unsafe extern "C" {
-        pub unsafe fn eraEceq06(date1: c_double, date2: c_double, dl: c_double, db: c_double, dr: *mut c_double, dd: *mut c_double);
-        pub unsafe fn eraEcm06(date1: c_double, date2: c_double, rm: *mut [c_double; 9]);
-        pub unsafe fn eraEqec06(date1: c_double, date2: c_double, dr: c_double, dd: c_double, dl: *mut c_double, db: *mut c_double);
-        pub unsafe fn eraLteceq(epj: c_double, dl: c_double, db: c_double, dr: *mut c_double, dd: *mut c_double);
-        pub unsafe fn eraLtecm(epj: c_double, rm: *mut [c_double; 9]);
-        pub unsafe fn eraLteqec(epj: c_double, dr: c_double, dd: c_double, dl: *mut c_double, db: *mut c_double);
-    }
-}
-
-pub mod galacticcoordinates {
-    use std::ffi::c_double;
-
-    unsafe extern "C" {
-        pub unsafe fn eraG2icrs(dl: c_double, db: c_double, dr: *mut c_double, dd: *mut c_double);
-        pub unsafe fn eraIcrs2g(dr: c_double, dd: c_double, dl: *mut c_double, db: *mut c_double);
-    }
-}
-
-pub mod geodeticgeocentric {
-    use std::ffi::{c_double, c_int};
-
-    unsafe extern "C" {
-        pub unsafe fn eraEform(n: c_int, a: *mut c_double, f: *mut c_double) -> c_int;
-        pub unsafe fn eraGc2gd(n: c_int, xyz: *mut [c_double; 3], elong: *mut c_double, phi: *mut c_double, height: *mut c_double) -> c_int;
-        pub unsafe fn eraGc2gde(a: c_double, f: c_double, xyz: *mut [c_double; 3], elong: *mut c_double, phi: *mut c_double, height: *mut c_double) -> c_int;
-        pub unsafe fn eraGd2gc(n: c_int, elong: c_double, phi: c_double, height: c_double, xyz: *mut [c_double; 3]) -> c_int;
-        pub unsafe fn eraGd2gce(a: c_double, f: c_double, elong: c_double, phi: c_double, height: c_double, xyz: *mut [c_double; 3]) -> c_int;
-    }
-}
-
 pub mod timescales {
     use std::ffi::{c_char, c_double, c_int};
 
@@ -267,28 +290,5 @@ pub mod timescales {
         pub unsafe fn eraUt1utc(ut11: c_double, ut12: c_double, dut1: c_double, utc1: *mut c_double, utc2: *mut c_double) -> c_int;
         pub unsafe fn eraUtctai(utc1: c_double, utc2: c_double, tai1: *mut c_double, tai2: *mut c_double) -> c_int;
         pub unsafe fn eraUtcut1(utc1: c_double, utc2: c_double, dut1: c_double, ut11: *mut c_double, ut12: *mut c_double) -> c_int;
-    }
-}
-
-pub mod horizonequatorial {
-    use std::ffi::c_double;
-
-    unsafe extern "C" {
-        pub unsafe fn eraAe2hd(az: c_double, el: c_double, phi: c_double, ha: *mut c_double, dec: *mut c_double);
-        pub unsafe fn eraHd2ae(ha: c_double, dec: c_double, phi: c_double, az: *mut c_double, el: *mut c_double);
-        pub unsafe fn eraHd2pa(ha: c_double, dec: c_double, phi: c_double) -> c_double;
-    }
-}
-
-pub mod gnomonic {
-    use std::ffi::{c_double, c_int};
-
-    unsafe extern "C" {
-        pub unsafe fn eraTpors(xi: c_double, eta: c_double, a: c_double, b: c_double, a01: *mut c_double, b01: *mut c_double, a02: *mut c_double, b02: *mut c_double) -> c_int;
-        pub unsafe fn eraTporv(xi: c_double, eta: c_double, v: *mut [c_double; 3], v01: *mut [c_double; 3], v02: *mut [c_double; 3]) -> c_int;
-        pub unsafe fn eraTpsts(xi: c_double, eta: c_double, a0: c_double, b0: c_double, a: *mut c_double, b: *mut c_double);
-        pub unsafe fn eraTpstv(xi: c_double, eta: c_double, v0: *mut [c_double; 3], v: *mut [c_double; 3]);
-        pub unsafe fn eraTpxes(a: c_double, b: c_double, a0: c_double, b0: c_double, xi: *mut c_double, eta: *mut c_double) -> c_int;
-        pub unsafe fn eraTpxev(v: *mut [c_double; 3], v0: *mut [c_double; 3], xi: *mut c_double, eta: *mut c_double) -> c_int;
     }
 }

@@ -1,4 +1,4 @@
-//! Functions for calculating ephemerides for objects within the solar system
+//! ERFA Ephemerides Functions
 
 use crate::{raw::ephemerides::*, unexpected_val_err, ERFAError};
 

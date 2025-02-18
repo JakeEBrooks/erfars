@@ -1,3 +1,5 @@
+//! ERFA Space Motion Functions
+
 use crate::{raw::spacemotion::*, unexpected_val_err, ERFAError};
 
 pub fn Pvstar(pv: &[f64; 6]) -> Result<(f64, f64, f64, f64, f64, f64), ERFAError> {

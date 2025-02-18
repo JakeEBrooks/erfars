@@ -1,3 +1,5 @@
+//! ERFA Astrometry Functions
+
 use std::ffi::CString;
 
 use crate::{raw::astrometry::*, unexpected_val_err, Astrom, ERFAError, LDBody};

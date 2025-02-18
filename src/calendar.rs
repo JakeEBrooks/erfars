@@ -1,5 +1,4 @@
-//! Functions for converting to and from Gregorian Calendar dates
-//! and the Julian and Besselian date formats.
+//! ERFA Calendar Functions
 
 use crate::{raw::calendar::*, unexpected_val_err, ERFAError};
 

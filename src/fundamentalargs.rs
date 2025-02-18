@@ -1,3 +1,5 @@
+//! ERFA Fundamental Arguments for Nutation
+
 use crate::raw::fundamentalargs::*;
 
 pub fn Fad03(t: f64) -> f64 {

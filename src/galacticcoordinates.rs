@@ -1,3 +1,5 @@
+//! ERFA Galactic Coordinates Functions
+
 use crate::raw::galacticcoordinates::*;
 
 pub fn G2icrs(dl: f64, db: f64) -> (f64, f64) {
