@@ -3,7 +3,7 @@ name = "erfars"
 version = "0.1.0"
 authors = ["Jacob Brooks"]
 edition = "2024"
-description = "Provides safe Rust bindings to the Essential Routines for Fundamental Astronomy (ERFA) C library."
+description = "Safe Rust bindings to the Essential Routines for Fundamental Astronomy (ERFA) C library."
 readme = "README.md"
 repository = "https://github.com/JakeEBrooks/erfars"
 

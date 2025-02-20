@@ -129,11 +129,11 @@ pub mod gnomonic {
 
     unsafe extern "C" {
         pub unsafe fn eraTpors(xi: c_double, eta: c_double, a: c_double, b: c_double, a01: *mut c_double, b01: *mut c_double, a02: *mut c_double, b02: *mut c_double) -> c_int;
-        pub unsafe fn eraTporv(xi: c_double, eta: c_double, v: *mut [c_double; 3], v01: *mut [c_double; 3], v02: *mut [c_double; 3]) -> c_int;
+        pub unsafe fn eraTporv(xi: c_double, eta: c_double, v: *const [c_double; 3], v01: *mut [c_double; 3], v02: *mut [c_double; 3]) -> c_int;
         pub unsafe fn eraTpsts(xi: c_double, eta: c_double, a0: c_double, b0: c_double, a: *mut c_double, b: *mut c_double);
-        pub unsafe fn eraTpstv(xi: c_double, eta: c_double, v0: *mut [c_double; 3], v: *mut [c_double; 3]);
+        pub unsafe fn eraTpstv(xi: c_double, eta: c_double, v0: *const [c_double; 3], v: *mut [c_double; 3]);
         pub unsafe fn eraTpxes(a: c_double, b: c_double, a0: c_double, b0: c_double, xi: *mut c_double, eta: *mut c_double) -> c_int;
-        pub unsafe fn eraTpxev(v: *mut [c_double; 3], v0: *mut [c_double; 3], xi: *mut c_double, eta: *mut c_double) -> c_int;
+        pub unsafe fn eraTpxev(v: *const [c_double; 3], v0: *const [c_double; 3], xi: *mut c_double, eta: *mut c_double) -> c_int;
     }
 }
 
