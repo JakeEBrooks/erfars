@@ -58,7 +58,6 @@ pub mod precnutpolar;
 pub mod rotationtime;
 pub mod spacemotion;
 pub mod starcatalogs;
-// TODO: timescales are not done
 pub mod timescales;
 
 pub mod raw;
