@@ -1,6 +1,6 @@
 //! ERFA Ephemerides Functions
 
-use crate::{raw::ephemerides::*, unexpected_val_err, ERFAError};
+use crate::{ERFAError, raw::ephemerides::*, unexpected_val_err};
 
 ///  Earth position and velocity, heliocentric and barycentric, with
 ///  respect to the Barycentric Celestial Reference System.

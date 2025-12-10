@@ -1,6 +1,6 @@
 //! ERFA Calendar Functions
 
-use crate::{raw::calendar::*, unexpected_val_err, ERFAError};
+use crate::{ERFAError, raw::calendar::*, unexpected_val_err};
 
 ///  Gregorian Calendar to Julian Date.
 ///

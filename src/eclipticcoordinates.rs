@@ -47,7 +47,7 @@ pub fn Eceq06(date1: f64, date2: f64, dl: f64, db: f64) -> (f64, f64) {
         eraEceq06(date1, date2, dl, db, &mut dr, &mut dd);
     }
 
-    return (dr, dd)
+    return (dr, dd);
 }
 
 ///  ICRS equatorial to ecliptic rotation matrix, IAU 2006.
@@ -147,7 +147,7 @@ pub fn Eqec06(date1: f64, date2: f64, dr: f64, dd: f64) -> (f64, f64) {
         eraEqec06(date1, date2, dr, dd, &mut dl, &mut db);
     }
 
-    return (dl, db)
+    return (dl, db);
 }
 
 ///  Transformation from ecliptic coordinates (mean equinox and ecliptic
@@ -201,7 +201,7 @@ pub fn Lteceq(epj: f64, dl: f64, db: f64) -> (f64, f64) {
         eraLteceq(epj, dl, db, &mut dr, &mut dd);
     }
 
-    return (dr, dd)
+    return (dr, dd);
 }
 
 ///  ICRS equatorial to ecliptic rotation matrix, long-term.
@@ -310,5 +310,5 @@ pub fn Lteqec(epj: f64, dr: f64, dd: f64) -> (f64, f64) {
         eraLteqec(epj, dr, dd, &mut dl, &mut db);
     }
 
-    return (dl, db)
+    return (dl, db);
 }
