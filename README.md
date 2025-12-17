@@ -16,4 +16,4 @@ Contributions are always welcome in the form of Github issues or pull requests, 
 
 ## Licensing
 
-This library is licensed under either the MIT License or the Apache 2.0 License at your option. A copy of the original ERFA license is provided [here](./LICENSE-ERFA.txt).
+This library is licensed under either the MIT License or the Apache 2.0 License at your option. A copy of the original ERFA license is provided in this repository [here](./LICENSE-ERFA.txt).

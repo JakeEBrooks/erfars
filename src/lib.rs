@@ -97,10 +97,7 @@ pub enum ERFAError {
 
 macro_rules! unexpected_val_err {
     ($fname:ident) => {
-        panic!(concat!(
-            "Unexpected value received from ERFA function",
-            stringify!($fname)
-        ))
+        panic!(concat!("Unexpected value received from ERFA function", stringify!($fname)))
     };
 }
 pub(crate) use unexpected_val_err;

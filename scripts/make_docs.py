@@ -1,6 +1,18 @@
-fn main() {
-    let srcpath = "external/erfa/src/";
-    let fnames = [
+"""
+Automatically parses the documentation comment from the ERFA source files and reformats them to Rust Markdown docstrings. Then, insert the formatted docstring into the appropriate Rust function
+
+THE RUST FUNCTION MUST HAVE NO DOCSTRING AT ALL FOR THIS TO WORK
+"""
+
+import re
+import textwrap
+
+from comment_parser import comment_parser
+
+ERFA_SRC = "https://github.com/liberfa/erfa/blob/master/src/"
+
+files = sorted(
+    [
         "ppsp.c",
         "epb.c",
         "gst06a.c",
@@ -251,7 +263,67 @@ fn main() {
         "pvppv.c",
         "c2ixy.c",
         "eect00.c",
-    ];
+    ]
+)
 
-    cc::Build::new().include(srcpath).files(fnames.map(|s| srcpath.to_owned() + s)).compile("erfa");
-}
+filepaths = ["../external/erfa/src/" + f for f in files]
+
+docstrings = {}
+
+for path, name in zip(filepaths, files):
+    comments = comment_parser.extract_comments(path)
+    doc_comment = comments[0].text()
+    func_description = doc_comment.replace("**", "").split("\n\n")[1]
+    cleaned_func_description = " ".join(func_description.split())
+    as_md_docstring = textwrap.wrap(
+        cleaned_func_description,
+        width=80,
+        initial_indent="/// ",
+        subsequent_indent="/// ",
+    )
+
+    as_md_docstring.append("/// ")
+    as_md_docstring.append(
+        "/// Please see the full ERFA docs for this function [here]({})".format(
+            ERFA_SRC + name
+        )
+    )
+
+    docstrings[name] = "\n".join(as_md_docstring)
+    print(f"DOCSTRING FOR {name}:\n")
+    print(docstrings[name])
+    print("")
+
+rs_src_files = [
+    "astrometry.rs",
+    "calendar.rs",
+    "eclipticcoordinates.rs",
+    "ephemerides.rs",
+    "fundamentalargs.rs",
+    "galacticcoordinates.rs",
+    "geodeticgeocentric.rs",
+    "gnomonic.rs",
+    "horizonequatorial.rs",
+    "precnutpolar.rs",
+    "rotationtime.rs",
+    "spacemotion.rs",
+    "starcatalogs.rs",
+    "timescales.rs",
+]
+
+filepaths = ["../src/" + f for f in rs_src_files]
+
+for path, name in zip(filepaths, rs_src_files):
+    with open(path, "r") as file:
+        contents = file.read()
+        funcmatches = re.findall("pub fn \w*", contents)
+        funcnames = [s.split()[2] for s in funcmatches]
+        cfilenames = [s.lower() + ".c" for s in funcnames]
+        print(cfilenames)
+        for func, cfilename in zip(funcnames, cfilenames):
+            contents = contents.replace(
+                f"pub fn {func}(", f"{docstrings[cfilename]}\npub fn {func}("
+            )
+
+    with open(path, "w") as file:
+        file.write(contents)
