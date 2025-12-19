@@ -1,21 +1,27 @@
 //! ERFA Gnomonic Projection Functions
 
-use crate::{ERFAError, raw::gnomonic::*, unexpected_val_err};
+use crate::{ERFAResult, raw::gnomonic::*, unexpected_val_err};
 
 /// In the tangent plane projection, given the rectangular coordinates of a star
 /// and its spherical coordinates, determine the spherical coordinates of the
 /// tangent point.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/tpors.c)
-pub fn Tpors(xi: f64, eta: f64, a: f64, b: f64) -> (f64, f64, f64, f64) {
+pub fn Tpors(xi: f64, eta: f64, a: f64, b: f64) -> ERFAResult<(f64, f64, f64, f64)> {
     let mut a01: f64 = 0.0;
     let mut b01: f64 = 0.0;
     let mut a02: f64 = 0.0;
     let mut b02: f64 = 0.0;
 
-    unsafe { _ = eraTpors(xi, eta, a, b, &mut a01, &mut b01, &mut a02, &mut b02) }
+    let err: i32;
+    unsafe { err = eraTpors(xi, eta, a, b, &mut a01, &mut b01, &mut a02, &mut b02) }
 
-    return (a01, b01, a02, b02);
+    match err {
+        0 => Ok(((a01, b01, a02, b02), 0)),
+        1 => Ok(((a01, b01, a02, b02), 1)),
+        2 => Ok(((a01, b01, a02, b02), 2)),
+        _ => unexpected_val_err!(eraTpors),
+    }
 }
 
 /// In the tangent plane projection, given the rectangular coordinates of a star
@@ -23,13 +29,19 @@ pub fn Tpors(xi: f64, eta: f64, a: f64, b: f64) -> (f64, f64, f64, f64) {
 /// point.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/tporv.c)
-pub fn Tporv(xi: f64, eta: f64, v: &[f64; 3]) -> ([f64; 3], [f64; 3]) {
+pub fn Tporv(xi: f64, eta: f64, v: &[f64; 3]) -> ERFAResult<([f64; 3], [f64; 3])> {
     let mut v01: [f64; 3] = [0.0; 3];
     let mut v02: [f64; 3] = [0.0; 3];
 
-    unsafe { _ = eraTporv(xi, eta, v, &mut v01, &mut v02) }
+    let err: i32;
+    unsafe { err = eraTporv(xi, eta, v, &mut v01, &mut v02) }
 
-    return (v01, v02);
+    match err {
+        0 => Ok(((v01, v02), 0)),
+        1 => Ok(((v01, v02), 1)),
+        2 => Ok(((v01, v02), 2)),
+        _ => unexpected_val_err!(eraTporv),
+    }
 }
 
 /// In the tangent plane projection, given the star's rectangular coordinates
@@ -68,7 +80,7 @@ pub fn Tpstv(xi: f64, eta: f64, v0: &[f64; 3]) -> [f64; 3] {
 /// the tangent plane.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/tpxes.c)
-pub fn Tpxes(a: f64, b: f64, a0: f64, b0: f64) -> Result<(f64, f64), ERFAError> {
+pub fn Tpxes(a: f64, b: f64, a0: f64, b0: f64) -> ERFAResult<(f64, f64)> {
     let mut xi: f64 = 0.0;
     let mut eta: f64 = 0.0;
     let err: i32;
@@ -78,10 +90,10 @@ pub fn Tpxes(a: f64, b: f64, a0: f64, b0: f64) -> Result<(f64, f64), ERFAError> 
     }
 
     match err {
-        0 => Ok((xi, eta)),
-        1 => Err(ERFAError::ERFABadInputValue),
-        2 => Err(ERFAError::ERFABadInputValue),
-        3 => Err(ERFAError::ERFABadInputValue),
+        0 => Ok(((xi, eta), 0)),
+        1 => Ok(((xi, eta), 1)),
+        2 => Ok(((xi, eta), 2)),
+        3 => Ok(((xi, eta), 3)),
         _ => unexpected_val_err!(eraTpxes),
     }
 }
@@ -91,7 +103,7 @@ pub fn Tpxes(a: f64, b: f64, a0: f64, b0: f64) -> Result<(f64, f64), ERFAError> 
 /// the tangent plane.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/tpxev.c)
-pub fn Tpxev(v: &[f64; 3], v0: &[f64; 3]) -> Result<(f64, f64), ERFAError> {
+pub fn Tpxev(v: &[f64; 3], v0: &[f64; 3]) -> ERFAResult<(f64, f64)> {
     let mut xi: f64 = 0.0;
     let mut eta: f64 = 0.0;
     let err: i32;
@@ -101,10 +113,10 @@ pub fn Tpxev(v: &[f64; 3], v0: &[f64; 3]) -> Result<(f64, f64), ERFAError> {
     }
 
     match err {
-        0 => Ok((xi, eta)),
-        1 => Err(ERFAError::ERFABadInputValue),
-        2 => Err(ERFAError::ERFABadInputValue),
-        3 => Err(ERFAError::ERFABadInputValue),
+        0 => Ok(((xi, eta), 0)),
+        1 => Ok(((xi, eta), 1)),
+        2 => Ok(((xi, eta), 2)),
+        3 => Ok(((xi, eta), 3)),
         _ => unexpected_val_err!(eraTpxev),
     }
 }

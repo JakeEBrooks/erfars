@@ -1,6 +1,6 @@
 //! ERFA Star Catalog Functions
 
-use crate::{ERFAError, raw::starcatalogs::*, unexpected_val_err};
+use crate::{ERFAResult, raw::starcatalogs::*, unexpected_val_err};
 
 /// Convert B1950.0 FK4 star catalog data to J2000.0 FK5.
 ///
@@ -155,7 +155,7 @@ pub fn Hfk5z(rh: f64, dh: f64, date1: f64, date2: f64) -> (f64, f64, f64, f64) {
 /// Star proper motion: update star catalog data for space motion.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/starpm.c)
-pub fn Starpm(ra1: f64, dec1: f64, pmr1: f64, pmd1: f64, px1: f64, rv1: f64, ep1a: f64, ep1b: f64, ep2a: f64, ep2b: f64) -> Result<(f64, f64, f64, f64, f64, f64), ERFAError> {
+pub fn Starpm(ra1: f64, dec1: f64, pmr1: f64, pmd1: f64, px1: f64, rv1: f64, ep1a: f64, ep1b: f64, ep2a: f64, ep2b: f64) -> ERFAResult<(f64, f64, f64, f64, f64, f64)> {
     let mut ra2: f64 = 0.0;
     let mut dec2: f64 = 0.0;
     let mut pmr2: f64 = 0.0;
@@ -166,12 +166,11 @@ pub fn Starpm(ra1: f64, dec1: f64, pmr1: f64, pmd1: f64, px1: f64, rv1: f64, ep1
 
     unsafe { err = eraStarpm(ra1, dec1, pmr1, pmd1, px1, rv1, ep1a, ep1b, ep2a, ep2b, &mut ra2, &mut dec2, &mut pmr2, &mut pmd2, &mut px2, &mut rv2) }
 
-    match err {
-        0 => Ok((ra2, dec2, pmr2, pmd2, px2, rv2)),
-        1 => Ok((ra2, dec2, pmr2, pmd2, px2, rv2)),
-        2 => Ok((ra2, dec2, pmr2, pmd2, px2, rv2)),
-        4 => Ok((ra2, dec2, pmr2, pmd2, px2, rv2)),
-        -1 => Err(ERFAError::ERFAInternalError),
-        _ => unexpected_val_err!(eraStarpm),
+    if err >= 0 {
+        return Ok(((ra2, dec2, pmr2, pmd2, px2, rv2), err));
+    } else if err == -1 {
+        return Err(-1);
+    } else {
+        unexpected_val_err!(eraStarpm)
     }
 }

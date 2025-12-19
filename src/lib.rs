@@ -1,5 +1,6 @@
-// TODO: uncomment when ready
-// #![warn(missing_docs)]
+#![warn(missing_docs)]
+#![allow(clippy::needless_return)]
+#![deny(clippy::implicit_return)]
 //! A Rust crate that provides safe Rust bindings to the Essential Routines for Fundamental Astronomy ([ERFA](https://github.com/liberfa/erfa))
 //! C library, which is based on the Standards of Fundamental Astronomy ([SOFA](https://www.iausofa.org/index.html)) library published by
 //! the International Astronomical Union (IAU).
@@ -10,14 +11,10 @@
 //! use erfars::calendar::Cal2jd;
 //!
 //! fn main() {
-//!     let (jd0, jd1) = Cal2jd(2025, 1, 22).unwrap();
+//!     let ((jd0, jd1), _) = Cal2jd(2025, 1, 22).unwrap();
 //!     assert_eq!(jd0+jd1, 2460697.5)
 //! }
 //! ```
-//!
-//! *Note: Documentation is currently not available for the safe versions of the ERFA functions,
-//! but for now the user can consult the original ERFA/SOFA documentation as the function interfaces
-//! are quite similar.*
 //!
 //! ### A note on array arguments in functions
 //! Many of the ERFA C functions pass data in the form of multidimensional arrays. For example, a `double[3][3]`
@@ -41,6 +38,28 @@
 //!
 //! For the user, this means that wherever you see something like a `double[2][3]` or a `double[3][3]` in
 //! the ERFA C API, you can safely pass a `[f64; 6]` or a `[f64; 9]` Rust value.
+//!
+//! ### A note on return values for some ERFA functions
+//! Some of the safe Rust ERFA functions return a [`ERFAResult`], which encapsulates both warnings and errors returned from ERFA.
+//! The [`Ok`] value of this result contains both the actual
+//! result and the warning code as a tuple. The warning code is equal to zero if all is ok.
+//! Warning codes from ERFA are always greater than zero, which means you can handle errors using something like:
+//!
+//! ```rust
+//! use erfars::calendar::Jdcalf;
+//!
+//! fn main() {
+//!     // Panics on error
+//!     // If a warning is raised, `warn` is > 0
+//!     let (res, warn) = Jdcalf(2460697.0, 0.5, 2).unwrap();
+//!     if warn > 0 {
+//!         // Do something
+//!     }
+//! }
+
+//! ```
+//!
+//! The meaning of the warning/error codes can be found in the ERFA docs for the relevant function.
 
 // Stop the linter from complaining about the ERFA function names
 #![allow(non_snake_case)]
@@ -66,34 +85,8 @@ pub mod raw;
 mod structs;
 pub use structs::{Astrom, LDBody};
 
-/// An error type for error codes returned by ERFA
-#[derive(Debug)]
-pub enum ERFAError {
-    /// Indicates a bad year input
-    ERFABadYear,
-    /// Indicates a bad month input
-    ERFABadMonth,
-    /// Indicates a bad day input
-    ERFABadDay,
-    /// Indicates a bad hour input
-    ERFABadHour,
-    /// Indicates a bad minute input
-    ERFABadMinute,
-    /// Indicates a bad second input
-    ERFABadSecond,
-    /// Indicates a bad fraction (of a day) input
-    ERFABadFraction,
-    /// Indicates a bad date input
-    ERFABadDate,
-    /// Indicates a generically bad input value
-    ERFABadInputValue,
-    /// Indicates a bad speed input
-    ERFABadSpeed,
-    /// Indicates a bad position input
-    ERFABadPosition,
-    /// Indicates an error within ERFA
-    ERFAInternalError,
-}
+/// A return type for ERFA functions which contains both a warning code and an error code.
+pub type ERFAResult<T> = Result<(T, i32), i32>;
 
 macro_rules! unexpected_val_err {
     ($fname:ident) => {

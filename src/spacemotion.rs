@@ -1,11 +1,11 @@
 //! ERFA Space Motion Functions
 
-use crate::{ERFAError, raw::spacemotion::*, unexpected_val_err};
+use crate::{ERFAResult, raw::spacemotion::*, unexpected_val_err};
 
 /// Convert star position+velocity vector to catalog coordinates.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/pvstar.c)
-pub fn Pvstar(pv: &[f64; 6]) -> Result<(f64, f64, f64, f64, f64, f64), ERFAError> {
+pub fn Pvstar(pv: &[f64; 6]) -> ERFAResult<(f64, f64, f64, f64, f64, f64)> {
     let mut ra: f64 = 0.0;
     let mut dec: f64 = 0.0;
     let mut pmr: f64 = 0.0;
@@ -16,9 +16,9 @@ pub fn Pvstar(pv: &[f64; 6]) -> Result<(f64, f64, f64, f64, f64, f64), ERFAError
     unsafe { err = eraPvstar(pv, &mut ra, &mut dec, &mut pmr, &mut pmd, &mut px, &mut rv) }
 
     match err {
-        0 => Ok((ra, dec, pmr, pmd, px, rv)),
-        -1 => Err(ERFAError::ERFABadSpeed),
-        -2 => Err(ERFAError::ERFABadPosition),
+        0 => Ok(((ra, dec, pmr, pmd, px, rv), 0)),
+        -1 => Err(-1),
+        -2 => Err(-2),
         _ => unexpected_val_err!(eraPvstar),
     }
 }
@@ -26,16 +26,10 @@ pub fn Pvstar(pv: &[f64; 6]) -> Result<(f64, f64, f64, f64, f64, f64), ERFAError
 /// Convert star catalog coordinates to position+velocity vector.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/starpv.c)
-pub fn Starpv(ra: f64, dec: f64, pmr: f64, pmd: f64, px: f64, rv: f64) -> [f64; 6] {
+pub fn Starpv(ra: f64, dec: f64, pmr: f64, pmd: f64, px: f64, rv: f64) -> ERFAResult<[f64; 6]> {
     let mut pv: [f64; 6] = [0.0; 6];
     let err: i32;
     unsafe { err = eraStarpv(ra, dec, pmr, pmd, px, rv, &mut pv) }
 
-    match err {
-        0 => pv,
-        1 => pv,
-        2 => pv,
-        4 => pv,
-        _ => unexpected_val_err!(eraStarpv),
-    }
+    if err >= 0 { return Ok((pv, err)) } else { unexpected_val_err!(eraStarpv) }
 }

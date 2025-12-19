@@ -1,21 +1,21 @@
 //! ERFA Calendar Functions
 
-use crate::{ERFAError, raw::calendar::*, unexpected_val_err};
+use crate::{ERFAResult, raw::calendar::*, unexpected_val_err};
 
 /// Gregorian Calendar to Julian Date.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/cal2jd.c)
-pub fn Cal2jd(year: i32, month: i32, day: i32) -> Result<(f64, f64), ERFAError> {
+pub fn Cal2jd(year: i32, month: i32, day: i32) -> ERFAResult<(f64, f64)> {
     let mut djm0: f64 = 0.0;
     let mut djm: f64 = 0.0;
     let err: i32;
     unsafe { err = eraCal2jd(year, month, day, &mut djm0, &mut djm) };
 
     match err {
-        0 => Ok((djm0, djm)),
-        -1 => Err(ERFAError::ERFABadYear),
-        -2 => Err(ERFAError::ERFABadMonth),
-        -3 => Err(ERFAError::ERFABadDay),
+        0 => Ok(((djm0, djm), err)),
+        -1 => Err(err),
+        -2 => Err(err),
+        -3 => Err(err),
         _ => unexpected_val_err!(eraCal2dj),
     }
 }
@@ -63,7 +63,7 @@ pub fn Epj2jd(epoch: f64) -> (f64, f64) {
 /// Julian Date to Gregorian year, month, day, and fraction of a day.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/jd2cal.c)
-pub fn Jd2cal(jd0: f64, jd1: f64) -> Result<(i32, i32, i32, f64), ERFAError> {
+pub fn Jd2cal(jd0: f64, jd1: f64) -> ERFAResult<(i32, i32, i32, f64)> {
     let mut iy: i32 = 0;
     let mut im: i32 = 0;
     let mut id: i32 = 0;
@@ -72,8 +72,8 @@ pub fn Jd2cal(jd0: f64, jd1: f64) -> Result<(i32, i32, i32, f64), ERFAError> {
     unsafe { err = eraJd2cal(jd0, jd1, &mut iy, &mut im, &mut id, &mut fd) };
 
     match err {
-        0 => Ok((iy, im, id, fd)),
-        -1 => Err(ERFAError::ERFABadDate),
+        0 => Ok(((iy, im, id, fd), 0)),
+        -1 => Err(-1),
         _ => unexpected_val_err!(eraJd2cal),
     }
 }
@@ -82,16 +82,15 @@ pub fn Jd2cal(jd0: f64, jd1: f64) -> Result<(i32, i32, i32, f64), ERFAError> {
 /// formatting messages: rounded to a specified precision.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/jdcalf.c)
-pub fn Jdcalf(jd0: f64, jd1: f64, ndp: i32) -> Result<(i32, i32, i32, i32), ERFAError> {
+pub fn Jdcalf(jd0: f64, jd1: f64, ndp: i32) -> ERFAResult<(i32, i32, i32, i32)> {
     let mut iymdf: [i32; 4] = [0, 0, 0, 0];
     let err: i32;
     unsafe { err = eraJdcalf(ndp, jd0, jd1, &mut iymdf) };
 
     match err {
-        0 => Ok((iymdf[0], iymdf[1], iymdf[2], iymdf[3])),
-        // If the ndp warning is returned, just ignore the warning
-        1 => Ok((iymdf[0], iymdf[1], iymdf[2], iymdf[3])),
-        -1 => Err(ERFAError::ERFABadDate),
+        0 => Ok(((iymdf[0], iymdf[1], iymdf[2], iymdf[3]), 0)),
+        1 => Ok(((iymdf[0], iymdf[1], iymdf[2], iymdf[3]), 1)),
+        -1 => Err(-1),
         _ => unexpected_val_err!(eraJdcalf),
     }
 }

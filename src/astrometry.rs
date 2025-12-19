@@ -2,7 +2,7 @@
 
 use std::ffi::CString;
 
-use crate::{Astrom, ERFAError, LDBody, raw::astrometry::*, unexpected_val_err};
+use crate::{Astrom, ERFAResult, LDBody, raw::astrometry::*, unexpected_val_err};
 
 /// Apply aberration to transform natural direction into proper direction.
 ///
@@ -87,15 +87,15 @@ pub fn Apco(
 /// and refraction constants.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/apco13.c)
-pub fn Apco13(utc1: f64, utc2: f64, dut1: f64, elong: f64, phi: f64, hm: f64, xp: f64, yp: f64, phpa: f64, tc: f64, rh: f64, w1: f64, astrom: &mut Astrom) -> Result<f64, ERFAError> {
+pub fn Apco13(utc1: f64, utc2: f64, dut1: f64, elong: f64, phi: f64, hm: f64, xp: f64, yp: f64, phpa: f64, tc: f64, rh: f64, w1: f64, astrom: &mut Astrom) -> ERFAResult<f64> {
     let mut eo: f64 = 0.0;
     let err: i32;
     unsafe { err = eraApco13(utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, w1, astrom, &mut eo) }
 
     match err {
-        1 => Ok(eo),
-        0 => Ok(eo),
-        -1 => Err(ERFAError::ERFABadDate),
+        1 => Ok((eo, 1)),
+        0 => Ok((eo, 0)),
+        -1 => Err(-1),
         _ => unexpected_val_err!(eraApco13),
     }
 }
@@ -150,14 +150,14 @@ pub fn Apio(sp: f64, theta: f64, elong: f64, phi: f64, hm: f64, xp: f64, yp: f64
 /// wavelength.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/apio13.c)
-pub fn Apio13(utc1: f64, utc2: f64, dut1: f64, elong: f64, phi: f64, hm: f64, xp: f64, yp: f64, phpa: f64, tc: f64, rh: f64, w1: f64, astrom: &mut Astrom) -> Option<ERFAError> {
+pub fn Apio13(utc1: f64, utc2: f64, dut1: f64, elong: f64, phi: f64, hm: f64, xp: f64, yp: f64, phpa: f64, tc: f64, rh: f64, w1: f64, astrom: &mut Astrom) -> ERFAResult<()> {
     let err: i32;
     unsafe { err = eraApio13(utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, w1, astrom) }
 
     match err {
-        1 => None,
-        0 => None,
-        -1 => Some(ERFAError::ERFABadDate),
+        1 => Ok(((), 1)),
+        0 => Ok(((), 0)),
+        -1 => Err(-1),
         _ => unexpected_val_err!(eraApio13),
     }
 }
@@ -252,7 +252,7 @@ pub fn Atco13(
     tc: f64,
     rh: f64,
     w1: f64,
-) -> Result<(f64, f64, f64, f64, f64, f64), ERFAError> {
+) -> ERFAResult<(f64, f64, f64, f64, f64, f64)> {
     let mut aob: f64 = 0.0;
     let mut zob: f64 = 0.0;
     let mut hob: f64 = 0.0;
@@ -267,9 +267,9 @@ pub fn Atco13(
     }
 
     match err {
-        1 => Ok((aob, zob, hob, dob, rob, eo)),
-        0 => Ok((aob, zob, hob, dob, rob, eo)),
-        -1 => Err(ERFAError::ERFABadDate),
+        1 => Ok(((aob, zob, hob, dob, rob, eo), 1)),
+        0 => Ok(((aob, zob, hob, dob, rob, eo), 0)),
+        -1 => Err(-1),
         _ => unexpected_val_err!(eraAtco13),
     }
 }
@@ -311,22 +311,7 @@ pub fn Aticqn(ri: f64, di: f64, astrom: &Astrom, b: &[LDBody]) -> (f64, f64) {
 /// ambient air conditions and observing wavelength.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/atio13.c)
-pub fn Atio13(
-    ri: f64,
-    di: f64,
-    utc1: f64,
-    utc2: f64,
-    dut1: f64,
-    elong: f64,
-    phi: f64,
-    hm: f64,
-    xp: f64,
-    yp: f64,
-    phpa: f64,
-    tc: f64,
-    rh: f64,
-    w1: f64,
-) -> Result<(f64, f64, f64, f64, f64), ERFAError> {
+pub fn Atio13(ri: f64, di: f64, utc1: f64, utc2: f64, dut1: f64, elong: f64, phi: f64, hm: f64, xp: f64, yp: f64, phpa: f64, tc: f64, rh: f64, w1: f64) -> ERFAResult<(f64, f64, f64, f64, f64)> {
     let mut aob: f64 = 0.0;
     let mut zob: f64 = 0.0;
     let mut hob: f64 = 0.0;
@@ -335,9 +320,9 @@ pub fn Atio13(
     let err: i32;
     unsafe { err = eraAtio13(ri, di, utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, w1, &mut aob, &mut zob, &mut hob, &mut dob, &mut rob) }
     match err {
-        1 => Ok((aob, zob, hob, dob, rob)),
-        0 => Ok((aob, zob, hob, dob, rob)),
-        -1 => Err(ERFAError::ERFABadDate),
+        1 => Ok(((aob, zob, hob, dob, rob), 1)),
+        0 => Ok(((aob, zob, hob, dob, rob), 0)),
+        -1 => Err(-1),
         _ => unexpected_val_err!(eraAtio13),
     }
 }
@@ -360,40 +345,22 @@ pub fn Atioq(ri: f64, di: f64, astrom: &Astrom) -> (f64, f64, f64, f64, f64) {
 /// wavelength.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/atoc13.c)
-pub fn Atoc13(
-    ctype: char,
-    ob1: f64,
-    ob2: f64,
-    utc1: f64,
-    utc2: f64,
-    dut1: f64,
-    elong: f64,
-    phi: f64,
-    hm: f64,
-    xp: f64,
-    yp: f64,
-    phpa: f64,
-    tc: f64,
-    rh: f64,
-    w1: f64,
-) -> Result<(f64, f64), ERFAError> {
+pub fn Atoc13(ctype: char, ob1: f64, ob2: f64, utc1: f64, utc2: f64, dut1: f64, elong: f64, phi: f64, hm: f64, xp: f64, yp: f64, phpa: f64, tc: f64, rh: f64, w1: f64) -> ERFAResult<(f64, f64)> {
     let charin = match ctype {
         'R' => CString::new("R"),
         'r' => CString::new("r"),
         'H' => CString::new("H"),
         'h' => CString::new("h"),
-        'A' => CString::new("A"),
-        'a' => CString::new("a"),
-        _ => return Err(ERFAError::ERFABadInputValue),
+        _ => CString::new("A"),
     };
     let mut ra: f64 = 0.0;
     let mut dec: f64 = 0.0;
     let err: i32;
     unsafe { err = eraAtoc13(charin.unwrap().as_ptr(), ob1, ob2, utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, w1, &mut ra, &mut dec) }
     match err {
-        1 => Ok((ra, dec)),
-        0 => Ok((ra, dec)),
-        -1 => Err(ERFAError::ERFABadDate),
+        1 => Ok(((ra, dec), 1)),
+        0 => Ok(((ra, dec), 0)),
+        -1 => Err(-1),
         _ => unexpected_val_err!(eraAtoc13),
     }
 }
@@ -402,40 +369,22 @@ pub fn Atoc13(
 /// air conditions and observing wavelength.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/atoi13.c)
-pub fn Atoi13(
-    ctype: char,
-    ob1: f64,
-    ob2: f64,
-    utc1: f64,
-    utc2: f64,
-    dut1: f64,
-    elong: f64,
-    phi: f64,
-    hm: f64,
-    xp: f64,
-    yp: f64,
-    phpa: f64,
-    tc: f64,
-    rh: f64,
-    w1: f64,
-) -> Result<(f64, f64), ERFAError> {
+pub fn Atoi13(ctype: char, ob1: f64, ob2: f64, utc1: f64, utc2: f64, dut1: f64, elong: f64, phi: f64, hm: f64, xp: f64, yp: f64, phpa: f64, tc: f64, rh: f64, w1: f64) -> ERFAResult<(f64, f64)> {
     let charin = match ctype {
         'R' => CString::new("R"),
         'r' => CString::new("r"),
         'H' => CString::new("H"),
         'h' => CString::new("h"),
-        'A' => CString::new("A"),
-        'a' => CString::new("a"),
-        _ => return Err(ERFAError::ERFABadInputValue),
+        _ => CString::new("A"),
     };
     let mut ra: f64 = 0.0;
     let mut dec: f64 = 0.0;
     let err: i32;
     unsafe { err = eraAtoi13(charin.unwrap().as_ptr(), ob1, ob2, utc1, utc2, dut1, elong, phi, hm, xp, yp, phpa, tc, rh, w1, &mut ra, &mut dec) }
     match err {
-        1 => Ok((ra, dec)),
-        0 => Ok((ra, dec)),
-        -1 => Err(ERFAError::ERFABadDate),
+        1 => Ok(((ra, dec), 1)),
+        0 => Ok(((ra, dec), 0)),
+        -1 => Err(-1),
         _ => unexpected_val_err!(eraAtoi13),
     }
 }
@@ -444,20 +393,18 @@ pub fn Atoi13(
 /// parameters.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/atoiq.c)
-pub fn Atoiq(ctype: char, ob1: f64, ob2: f64, astrom: &Astrom) -> Result<(f64, f64), ERFAError> {
+pub fn Atoiq(ctype: char, ob1: f64, ob2: f64, astrom: &Astrom) -> (f64, f64) {
     let charin = match ctype {
         'R' => CString::new("R"),
         'r' => CString::new("r"),
         'H' => CString::new("H"),
         'h' => CString::new("h"),
-        'A' => CString::new("A"),
-        'a' => CString::new("a"),
-        _ => return Err(ERFAError::ERFABadInputValue),
+        _ => CString::new("A"),
     };
     let mut ra: f64 = 0.0;
     let mut dec: f64 = 0.0;
-    unsafe { eraAtoiq(charin.unwrap().as_ptr(), ob1, ob2, astrom, &mut ra, &mut dec) }
-    return Ok((ra, dec));
+    unsafe { eraAtoiq(charin.unwrap().as_ptr(), ob1, ob2, astrom, &mut ra, &mut dec) };
+    return (ra, dec);
 }
 
 /// Apply light deflection by a solar-system body, as part of transforming
@@ -502,7 +449,7 @@ pub fn Pmpx(rc: f64, dc: f64, pr: f64, pd: f64, px: f64, rv: f64, pmt: f64, pob:
 /// handling to handle the zero parallax case.
 ///
 /// Please see the full ERFA docs for this function [here](https://github.com/liberfa/erfa/blob/master/src/pmsafe.c)
-pub fn Pmsafe(ra: f64, dec: f64, pmr: f64, pmd: f64, px: f64, rv: f64, ep1a: f64, ep1b: f64, ep2a: f64, ep2b: f64) -> (f64, f64, f64, f64, f64, f64) {
+pub fn Pmsafe(ra: f64, dec: f64, pmr: f64, pmd: f64, px: f64, rv: f64, ep1a: f64, ep1b: f64, ep2a: f64, ep2b: f64) -> ERFAResult<(f64, f64, f64, f64, f64, f64)> {
     let mut ra2: f64 = 0.0;
     let mut dec2: f64 = 0.0;
     let mut pmr2: f64 = 0.0;
@@ -512,11 +459,7 @@ pub fn Pmsafe(ra: f64, dec: f64, pmr: f64, pmd: f64, px: f64, rv: f64, ep1a: f64
     let err: i32;
     unsafe { err = eraPmsafe(ra, dec, pmr, pmd, px, rv, ep1a, ep1b, ep2a, ep2b, &mut ra2, &mut dec2, &mut pmr2, &mut pmd2, &mut px2, &mut rv2) }
 
-    if err < 0 {
-        panic!("ERFA encountered a system error in call to eraPmsafe")
-    }
-
-    return (ra2, dec2, pmr2, pmd2, px2, rv2);
+    return Ok(((ra2, dec2, pmr2, pmd2, px2, rv2), err));
 }
 
 /// Position and velocity of a terrestrial observing station.
