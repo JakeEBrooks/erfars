@@ -1,3 +1,5 @@
+__This project is no longer being developed. It was a side project for me to learn FFI in Rust, and contains some issues that I will not fix. I instead recommend using the [rust-erfa](https://github.com/cjordan/rust-erfa) crate__
+
 <div align="center">
 
 # erfars
